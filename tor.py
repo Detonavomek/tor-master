@@ -1,12 +1,15 @@
+from threading import Thread
+import subprocess
+import time
+import os
+
 from jinja2 import Template
 
 
-#tor -f /tmp/tor.config.9070
 class Tor(object):
 
 	CONFIG_PATH = '/tmp/tor.config.{}'
 	DATA_PATH = '/tmp/tor.data.{}'
-	RUN_TOR_CMD = 'tor -f {}'
 	TEMPLATE_CONFIG_PATH = 'torrc.template'
 
 	STATUSES = {
@@ -26,7 +29,6 @@ class Tor(object):
 
 		self.CONFIG_PATH = Tor.CONFIG_PATH.format(port)
 		self.DATA_PATH = Tor.DATA_PATH.format(port)
-		self.RUN_TOR_CMD = Tor.RUN_TOR_CMD.format(self.CONFIG_PATH)
 		
 		self.port = port
 		self.control_port = control_port
@@ -42,10 +44,21 @@ class Tor(object):
 			config_file.write(config)
 
 	def run(self):
-		pass
+
+		def run_thread(CONFIG_PATH):
+			self._status = 2
+			subprocess.call(["tor", "-f", CONFIG_PATH])
+			self._status = 1
+
+		if self._status == 1:
+			thread = Thread(target = run_thread, args = (self.CONFIG_PATH, ))
+			thread.start()
+			time.sleep(10)
 
 	def stop(self):
-		pass
+		cmd = "kill $(ps -a | grep tor | grep " + str(self.port) + " | awk '{print $1}')"
+		os.system(cmd)
+		time.sleep(1)
 
 	def flush_all(self):
 		pass

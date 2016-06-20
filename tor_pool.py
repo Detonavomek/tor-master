@@ -41,7 +41,7 @@ class TorPool(object):
 
 	# @self.check_port
 	def stop(self, port):
-		self._instances[port].run()
+		self._instances[port].stop()
 
 	def stop_all(self):
 		for port, instance in self._instances.items():
