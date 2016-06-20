@@ -1,4 +1,4 @@
-from .tor import Tor
+from tor import Tor
 
 
 class TorPool(object):
@@ -10,8 +10,8 @@ class TorPool(object):
 
 	@property
 	def instances(self):
-		res = ''
-		for port, instance from self._instances:
+		res = 'Tor instances:\n'
+		for port, instance in self._instances.items():
 			res += '{port} {control_port} {status}\n'.format(
 				port=instance.port,
 				control_port=instance.control_port,
@@ -21,28 +21,31 @@ class TorPool(object):
 	def check_port(self, port):
 		pass
 
-	@self.check_port(port)
-	@self.check_port(control_port)
+	# @self.check_port(port)
+	# @self.check_port(control_port)
 	def add(self, port, control_port):
 		self._instances[port] = Tor(port, control_port)
 		return self._instances[port]
 
-	@self.check_port
+	# @self.check_port
 	def remove(self, port):
 		del self._instances[port]
 
-	@self.check_port
+	# @self.check_port
 	def run(self, port):
 		self._instances[port].run()
 
 	def run_all(self):
-		for port, instance from self._instances:
+		for port, instance in self._instances.items():
 			instance.run()
 
-	@self.check_port
+	# @self.check_port
 	def stop(self, port):
 		self._instances[port].run()
 
 	def stop_all(self):
-		for port, instance from self._instances:
+		for port, instance in self._instances.items():
 			instance.stop()
+
+	def flush_all(self):
+		pass

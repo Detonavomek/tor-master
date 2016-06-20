@@ -1,0 +1,3 @@
+SocksPort {{ port }}
+ControlPort {{ control_port }}
+DataDirectory /usr/local/var/lib/tor{{ port }}
