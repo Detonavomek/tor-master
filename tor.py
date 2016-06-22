@@ -1,10 +1,17 @@
 from threading import Thread
+from datetime import datetime
 import subprocess
 import time
 import os
 
+from stem import Signal
+from stem.control import Controller
 from jinja2 import Template
 
+
+class TorIpUpdateException(Exception):
+	message_template = "Cannot update Tor IP. You can do it in {0} seconds"
+	pass
 
 class Tor(object):
 
@@ -20,6 +27,7 @@ class Tor(object):
 	port = None
 	control_port = None
 	_status = None
+	_ip_updated_time = None
 
 	@property
 	def status(self):
@@ -33,6 +41,7 @@ class Tor(object):
 		self.port = port
 		self.control_port = control_port
 		self._status = 1
+		self._ip_updated_time = None
 		
 		self._create()
 
@@ -44,21 +53,30 @@ class Tor(object):
 			config_file.write(config)
 
 	def run(self):
-
-		def run_thread(CONFIG_PATH):
-			self._status = 2
-			subprocess.call(["tor", "-f", CONFIG_PATH])
-			self._status = 1
-
 		if self._status == 1:
-			thread = Thread(target = run_thread, args = (self.CONFIG_PATH, ))
-			thread.start()
-			time.sleep(10)
+			self.stop()
+			proc = subprocess.Popen(["tor", "-f", self.CONFIG_PATH],stdout=subprocess.PIPE)
+			while True:
+				line = proc.stdout.readline()
+				if 'Bootstrapped 100%' in line:
+					self._status = 2
+					self._ip_updated_time = datetime.now()
+					break
 
 	def stop(self):
 		cmd = "kill $(ps -a | grep tor | grep " + str(self.port) + " | awk '{print $1}')"
 		os.system(cmd)
-		time.sleep(1)
+		self._status = 1
+
+	def update_ip(self):
+		seconds = (datetime.now() - self._ip_updated_time).seconds
+		if seconds < 10:
+		    raise TorIpUpdateException(TorIpUpdateException.message_template.format(seconds), seconds)
+		with Controller.from_port(port=self.control_port) as controller:
+			controller.authenticate()
+			controller.signal(Signal.NEWNYM)
+			self._ip_updated_time = datetime.now()
+		return 0
 
 	def flush_all(self):
 		pass

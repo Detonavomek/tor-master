@@ -40,6 +40,10 @@ class TorPool(object):
 			instance.run()
 
 	# @self.check_port
+	def update_ip(self, port):
+		return self._instances[port].update_ip()
+
+	# @self.check_port
 	def stop(self, port):
 		self._instances[port].stop()
 
