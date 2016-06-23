@@ -1,4 +1,3 @@
-from threading import Thread
 from datetime import datetime
 import subprocess
 import time
@@ -13,6 +12,7 @@ TEMPLATE_CONFIG = """
 SocksPort {{ port }}
 ControlPort {{ control_port }}
 DataDirectory /tmp/tor.datadir.{{ port }}
+
 """
 
 class TorIpUpdateException(Exception):
@@ -82,7 +82,7 @@ class Tor(object):
 	def update_ip(self):
 		seconds = (datetime.now() - self._ip_updated_time).seconds
 		if seconds < 10:
-		    raise TorIpUpdateException(TorIpUpdateException.message_template.format(seconds), seconds)
+		    raise TorIpUpdateException(TorIpUpdateException.message_template.format(10-seconds), seconds)
 		with Controller.from_port(port=self.control_port) as controller:
 			controller.authenticate()
 			controller.signal(Signal.NEWNYM)

@@ -4,7 +4,7 @@ from setuptools import setup
 
 setup(
     name = "tor_pool",
-    version = "1.0",
+    version = "1.0.1",
     author = "detonavomek",
     author_email = "detonavomek@gmail.com",
     description = ("Pool Tors controller"),

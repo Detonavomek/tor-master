@@ -1,2 +1,2 @@
-from tor import Tor, TorIpUpdateException
+from tor import Tor, TorIpUpdateException, TorRunException
 from pool import TorPool
