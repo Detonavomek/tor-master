@@ -16,10 +16,10 @@ setup(
     url = "http://github.com/Detonavomek/tor-pool",
     packages=['tor-pool'],
     long_description=read('README.md'),
-    extras_require={
-        "Jinja2": ["Jinja2==2.8"],
-        "stem": ["stem==1.4.0"],
-    },
+    install_requires=[
+        "Jinja2==2.8",
+        "stem==1.4.0"
+    ],
     classifiers=[
         "Topic :: Utilities",
         "License :: OSI Approved :: BSD License",
