@@ -9,15 +9,24 @@ from stem.control import Controller
 from jinja2 import Template
 
 
+TEMPLATE_CONFIG = """
+SocksPort {{ port }}
+ControlPort {{ control_port }}
+DataDirectory /usr/local/var/lib/tor{{ port }}
+"""
+
 class TorIpUpdateException(Exception):
 	message_template = "Cannot update Tor IP. You can do it in {0} seconds"
+	pass
+
+class TorRunException(Exception):
+	message_template = "Cannot run Tor"
 	pass
 
 class Tor(object):
 
 	CONFIG_PATH = '/tmp/tor.config.{}'
 	DATA_PATH = '/tmp/tor.data.{}'
-	TEMPLATE_CONFIG_PATH = 'torrc.template'
 
 	STATUSES = {
 		1: 'STOP',
@@ -46,8 +55,7 @@ class Tor(object):
 		self._create()
 
 	def _create(self):
-		with open(Tor.TEMPLATE_CONFIG_PATH) as template_file:
-			template = Template(template_file.read())
+		template = Template(TEMPLATE_CONFIG)
 		config = template.render(port=self.port, control_port=self.control_port)
 		with open(self.CONFIG_PATH, 'w') as config_file:
 			config_file.write(config)
@@ -62,6 +70,9 @@ class Tor(object):
 					self._status = 2
 					self._ip_updated_time = datetime.now()
 					break
+				if not line:
+					raise TorRunException(TorRunException.message_template)
+
 
 	def stop(self):
 		cmd = "kill $(ps -a | grep tor | grep " + str(self.port) + " | awk '{print $1}')"

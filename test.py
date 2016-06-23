@@ -1,7 +1,7 @@
 import time
 
 from tor_pool import TorPool
-from tor import TorIpUpdateException
+from tor_pool import TorIpUpdateException
 
 
 tors = TorPool()
