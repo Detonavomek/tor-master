@@ -82,12 +82,12 @@ class Tor(object):
 	def update_ip(self):
 		seconds = (datetime.now() - self._ip_updated_time).seconds
 		if seconds < 10:
-		    raise TorIpUpdateException(TorIpUpdateException.message_template.format(10-seconds), seconds)
+		    raise TorIpUpdateException(TorIpUpdateException.message_template.format(10-seconds), 10-seconds)
 		with Controller.from_port(port=self.control_port) as controller:
 			controller.authenticate()
 			controller.signal(Signal.NEWNYM)
 			self._ip_updated_time = datetime.now()
 		return 0
 
-	def flush_all(self):
+	def flush_all(self): #TODO: write it
 		pass
