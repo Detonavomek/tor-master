@@ -12,7 +12,7 @@ from jinja2 import Template
 TEMPLATE_CONFIG = """
 SocksPort {{ port }}
 ControlPort {{ control_port }}
-DataDirectory /usr/local/var/lib/tor{{ port }}
+DataDirectory /tmp/tor.datadir.{{ port }}
 """
 
 class TorIpUpdateException(Exception):
